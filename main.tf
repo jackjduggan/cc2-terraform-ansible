@@ -71,5 +71,61 @@ resource "aws_security_group" "cc2-terraform-ansible-sg" {
 
 }
 
-# Step 3: HAProxy Instance
+# Step 4: HAProxy Instance
+resource "aws_instance" "haproxy" {
+  #ami           = "ami-07d9b9ddc6cd8dd30"
+  ami           = "ami-07d9b9ddc6cd8dd30" 
+  instance_type = "t2.micro"          
+  subnet_id              = aws_subnet.public.id
+  security_groups        = [aws_security_group.cc2-terraform-ansible-sg.id]
+  associate_public_ip_address = true # public
+  tags = {
+    Name = "cc2-tf-ans-haproxy"
+  }
+}
 
+# Step 5: Nginx Webserver Instances
+resource "aws_instance" "nginx1" {
+  ami           = "ami-07d9b9ddc6cd8dd30"  
+  instance_type = "t2.micro"
+
+  subnet_id           = aws_subnet.private.id
+  security_groups     = [aws_security_group.cc2-terraform-ansible-sg.id]
+  associate_public_ip_address = false  # not public
+
+  tags = {
+    Name = "cc2-tf-ans-webserver1"
+  }
+}
+
+resource "aws_instance" "nginx2" {
+  ami           = "ami-07d9b9ddc6cd8dd30" 
+  instance_type = "t2.micro"
+
+  subnet_id           = aws_subnet.private.id
+  security_groups     = [aws_security_group.cc2-terraform-ansible-sg.id]
+  associate_public_ip_address = false
+
+  tags = {
+    Name = "cc2-tf-ans-webserver2"
+  }
+}
+
+data "template_file" "jump_user_data" {
+    template = file("jump-config.cfg")
+}
+
+# Step 6: Jump Host
+resource "aws_instance" "jump" {
+  ami           = "ami-07d9b9ddc6cd8dd30" 
+  instance_type = "t2.micro"
+
+  subnet_id           = aws_subnet.public.id
+  user_data           = data.template_file.jump_user_data.rendered
+  security_groups     = [aws_security_group.cc2-terraform-ansible-sg.id]
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "cc2-tf-ans-jump"
+  }
+}
