@@ -11,20 +11,20 @@ terraform {
 
 # Prerequiste: Initialize AWS
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
 
 # Step 1: VPC
 resource "aws_vpc" "vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
 }
 
 # Step 2: Private* and Public Subnets
 #         * private subnet may not be used.
 resource "aws_subnet" "private" {
-  cidr_block              = "10.0.1.0/24"
+  cidr_block              = var.private_subnet_cidr
   vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = "us-east-1a"
+  availability_zone       = var.availability_zone
   map_public_ip_on_launch = false
 
   tags = {
@@ -33,9 +33,9 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_subnet" "public" {
-  cidr_block              = "10.0.2.0/24"
+  cidr_block              = var.public_subnet_cidr
   vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = "us-east-1a"
+  availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
 
   tags = {
@@ -47,26 +47,24 @@ resource "aws_subnet" "public" {
 resource "aws_security_group" "cc2-terraform-ansible-sg" {
   vpc_id = aws_vpc.vpc.id
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.ingress_rules
+    content {
+      from_port   = ingress.value.from_port
+      to_port     = ingress.value.to_port
+      protocol    = ingress.value.protocol
+      cidr_blocks = ingress.value.cidr_blocks
+    }
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Allow All Egress
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "egress" {
+    for_each = var.egress_rules
+    content {
+      from_port   = egress.value.from_port
+      to_port     = egress.value.to_port
+      protocol    = egress.value.protocol
+      cidr_blocks = egress.value.cidr_blocks
+    }
   }
 }
 
@@ -99,8 +97,8 @@ resource "aws_route_table_association" "public_rta" {
 # Step 4: HAProxy Instance
 resource "aws_instance" "haproxy" {
   #ami           = "ami-07d9b9ddc6cd8dd30"
-  ami           = "ami-07d9b9ddc6cd8dd30" 
-  instance_type = "t2.micro"          
+  ami           = var.ami_id
+  instance_type = var.instance_type       
   subnet_id              = aws_subnet.public.id
   security_groups        = [aws_security_group.cc2-terraform-ansible-sg.id]
   associate_public_ip_address = true # public
@@ -111,8 +109,8 @@ resource "aws_instance" "haproxy" {
 
 # Step 5: Nginx Webserver Instances
 resource "aws_instance" "nginx1" {
-  ami           = "ami-07d9b9ddc6cd8dd30"  
-  instance_type = "t2.micro"
+  ami           = var.ami_id
+  instance_type = var.instance_type
 
   subnet_id           = aws_subnet.private.id
   security_groups     = [aws_security_group.cc2-terraform-ansible-sg.id]
@@ -124,8 +122,8 @@ resource "aws_instance" "nginx1" {
 }
 
 resource "aws_instance" "nginx2" {
-  ami           = "ami-07d9b9ddc6cd8dd30" 
-  instance_type = "t2.micro"
+  ami           = var.ami_id 
+  instance_type = var.instance_type
 
   subnet_id           = aws_subnet.private.id
   security_groups     = [aws_security_group.cc2-terraform-ansible-sg.id]
@@ -142,8 +140,8 @@ data "template_file" "jump_user_data" {
 
 # Step 6: Jump Host
 resource "aws_instance" "jump" {
-  ami           = "ami-07d9b9ddc6cd8dd30" 
-  instance_type = "t2.micro"
+  ami           = var.ami_id
+  instance_type = var.instance_type
 
   subnet_id           = aws_subnet.public.id
   user_data           = data.template_file.jump_user_data.rendered
