@@ -1,10 +1,10 @@
 ---
-- hosts: all
-  remote_user: jack
+- name: Configure bastion 
+  hosts: bastion
   become: true
   tasks:
   - name: Copy SSH key from local to jumphost
-  copy:
-    src: /home/jackd/.ssh/cc2-tf-ans-key-3.pem
-    dest: /home/jack/.ssh/cc2-tf-ans-key-3.pem
-    mode: 0600
+    copy:
+      src: /home/jackd/.ssh/cc2-tf-ans-key-3.pem
+      dest: /home/jack/.ssh/cc2-tf-ans-key-3.pem
+      mode: 0600
