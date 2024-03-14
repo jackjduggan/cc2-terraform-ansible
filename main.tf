@@ -152,3 +152,19 @@ resource "aws_instance" "jump" {
     Name = "cc2-tf-ans-jump"
   }
 }
+
+output "webserver1_ip" {
+  value = aws_instance.nginx1.private_ip
+}
+
+output "webserver2_ip" {
+    value = aws_instance.nginx2.private_ip
+}
+
+output "haproxy_ip" {
+  value = aws_instance.haproxy.public_ip
+}
+
+output "bastion_ip" {
+  value = aws_instance.bastion.public_ip
+}
