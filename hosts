@@ -1,0 +1,11 @@
+# Ansible Inventory File
+
+[webserver]
+webserver1 ansible_host=10.0.1.89
+webserver2 ansible_host=10.0.1.121
+
+[haproxy]
+haproxy1 ansible_host=3.86.214.26
+
+[bastion]
+bastion1 ansible_host=3.95.155.3
