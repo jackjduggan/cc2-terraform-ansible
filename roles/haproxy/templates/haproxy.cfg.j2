@@ -24,10 +24,10 @@ frontend http-in
 backend nodes
  mode http
  balance roundrobin
- option forwardfor
- http-request set-header X-Forwarded-Port %[dst_port]
- http-request add-header X-Forwarded-Proto https if { ssl_fc }
- option httpchk HEAD / HTTP/1.1\r\nHost:localhost
+ #option forwardfor
+ #http-request set-header X-Forwarded-Port %[dst_port]
+ #http-request add-header X-Forwarded-Proto https if { ssl_fc }
+ #option httpchk HEAD / HTTP/1.1\r\nHost:localhost
 {% for host in groups['webserver'] %}
- server {{ host }} {{ hostvars[host].ansible_host }}:9000 check
+ server {{ host }} {{ hostvars[host].ansible_host }}:80 check
 {% endfor %}

@@ -1,11 +1,11 @@
 # Ansible Inventory File
 
 [webserver]
-webserver1 ansible_host=34.227.142.231 ansible_user=jack ansible_ssh_private_key_file=~/.ssh/cc2-tf-ans-key-3.pem nginx_ip=34.227.142.231
-webserver2 ansible_host=3.82.158.126 ansible_user=jack ansible_ssh_private_key_file=~/.ssh/cc2-tf-ans-key-3.pem nginx_ip=3.82.158.126
+webserver1 ansible_host=3.92.68.242 ansible_user=jack ansible_ssh_private_key_file=~/.ssh/cc2-tf-ans-key-3.pem nginx_ip=10.0.2.33
+webserver2 ansible_host=3.85.238.186 ansible_user=jack ansible_ssh_private_key_file=~/.ssh/cc2-tf-ans-key-3.pem nginx_ip=10.0.2.14
 
 [haproxy]
-haproxy1 ansible_host=18.212.12.104 ansible_user=jack ansible_ssh_private_key_file=~/.ssh/cc2-tf-ans-key-3.pem
+haproxy1 ansible_host=54.92.238.33 ansible_user=jack ansible_ssh_private_key_file=~/.ssh/cc2-tf-ans-key-3.pem
 
 #[bastion]
 #bastion1 ansible_host= ansible_user=jack ansible_ssh_private_key_file=~/.ssh/cc2-tf-ans-key-3.pem

@@ -21,16 +21,16 @@ resource "aws_vpc" "vpc" {
 
 # Step 2: Private* and Public Subnets
 #         * private subnet may not be used.
-resource "aws_subnet" "private" {
-  cidr_block              = var.private_subnet_cidr
-  vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = var.availability_zone
-  map_public_ip_on_launch = false
+# resource "aws_subnet" "private" {
+#   cidr_block              = var.private_subnet_cidr
+#   vpc_id                  = aws_vpc.vpc.id
+#   availability_zone       = var.availability_zone
+#   map_public_ip_on_launch = false
 
-  tags = {
-    Name = "private-subnet"
-  }
-}
+#   tags = {
+#     Name = "private-subnet"
+#   }
+# }
 
 resource "aws_subnet" "public" {
   cidr_block              = var.public_subnet_cidr
@@ -103,7 +103,7 @@ resource "aws_instance" "haproxy" {
   #ami           = "ami-07d9b9ddc6cd8dd30"
   ami           = var.ami_id
   instance_type = var.instance_type       
-  
+
   subnet_id              = aws_subnet.public.id
   user_data           = data.template_file.jump_user_data.rendered
   security_groups        = [aws_security_group.cc2-terraform-ansible-sg.id]
@@ -170,6 +170,14 @@ output "webserver2_ip" {
 
 output "haproxy_ip" {
   value = aws_instance.haproxy.public_ip
+}
+
+output "webserver1_ip_PRIVATE" {
+  value = aws_instance.nginx1.private_ip
+}
+
+output "webserver2_ip_PRIVATE" {
+  value = aws_instance.nginx2.private_ip
 }
 
 # output "bastion_ip" {
