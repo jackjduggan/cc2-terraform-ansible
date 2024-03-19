@@ -1,0 +1,45 @@
+---
+- name: Nginx Configuration
+  remote_user: jack
+  become: true
+  hosts: webserver
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+  tasks:
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+      
+  - name: Nginx Installation
+    apt:
+      name: nginx
+      state: latest # installation of latest nginx version.
+
+  - name: Create index.html file
+    copy:
+      dest: /var/www/html/index.html 
+      content: |
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>{{ nginx_ip }}</title>
+        <style>
+            body {
+                width: 35em;
+                margin: 0 auto;
+                font-family: Tahoma, Verdana, Arial, sans-serif;
+            }
+        </style>
+        </head>
+        <body>
+        <p><em>IT WORKS :)</em></p>
+        </body>
+        </html>
+
+  - name: Reload Nginx
+    service:
+      name: nginx
+      state: restarted
