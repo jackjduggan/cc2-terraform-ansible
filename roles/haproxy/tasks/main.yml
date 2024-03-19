@@ -1,0 +1,24 @@
+---
+- name: HAProxy Installation & Configuration
+  remote_user: jack
+  become: true
+  hosts: haproxy
+  vars:
+    haproxy_config_file: /etc/haproxy/haproxy.cfg
+    ansible_connection: ssh
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  tasks:
+    - name: HAProxy Installation
+      apt:
+        name: haproxy
+        state: present
+
+    - name: Copy configuration file from template
+      template:
+        src: ../templates/haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+
+    - name: Restart HAProxy
+      service:
+        name: haproxy
+        state: restarted
