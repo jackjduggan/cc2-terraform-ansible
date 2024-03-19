@@ -12,7 +12,7 @@
     apt:
       update_cache: yes
       cache_valid_time: 3600
-      
+
   - name: Nginx Installation
     apt:
       name: nginx
@@ -26,15 +26,9 @@
         <html>
         <head>
         <title>{{ nginx_ip }}</title>
-        <style>
-            body {
-                width: 35em;
-                margin: 0 auto;
-                font-family: Tahoma, Verdana, Arial, sans-serif;
-            }
-        </style>
         </head>
         <body>
+        <h1>You're looking at EC2 Instance: {{ nginx_ip }}</h1>
         <p><em>IT WORKS :)</em></p>
         </body>
         </html>
