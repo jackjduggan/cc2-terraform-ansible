@@ -41,6 +41,7 @@ You must then encrypt the file with Ansible Vault with the command:\
 You may then run the configuration manually with:
 - `$ terraform init`
 - `$ terraform apply`
+- `$ sh update_hosts.sh`
 - `$ ansible-playbook -i hosts roles/webserver/tasks/main.yml`
 - `$ ansible-playbook -i hosts --vault-password-file .vault_pass.txt roles/haproxy/tasks/main.yml`
 - `$ curl http://<haproxy_ip>`
@@ -48,3 +49,5 @@ You may then run the configuration manually with:
 Or you can run it automatically by simply running the script
 - `$ sh main.sh`
 However, you must ensure you have done the steps above for creating the `secret_vars.yml` and `.vault_pass.txt` file.
+
+(Please note that I have not tested this, and as such these may not be exact instructions)
