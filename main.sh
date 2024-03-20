@@ -62,6 +62,7 @@ fi
 echo "Hosts script execution completed successfully."
 
 # 5. Ansible
+
 # Check for the existence of the Ansible playbook for the webserver
 if [ -f "roles/webserver/tasks/main.yml" ]; then
     echo "Found webserver playbook. Executing Ansible playbook..."
@@ -76,10 +77,24 @@ else
     exit 1
 fi
 
+# Check if the vault password file exists and has the correct permissions
+vault_password_file=".vault_pass.txt"
+if [ ! -f "$vault_password_file" ]; then
+    echo "Error: Vault password file $vault_password_file does not exist."
+    exit 1
+fi
+
+# Ensure the file permissions are set to 600
+file_perm=$(stat -c "%a" "$vault_password_file")
+if [ "$file_perm" -ne "600" ]; then
+    echo "Error: Incorrect permissions on $vault_password_file. It should be 600."
+    exit 1
+fi
+
 # Check for the existence of the Ansible playbook for HAProxy
 if [ -f "roles/haproxy/tasks/main.yml" ]; then
-    echo "Found HAProxy playbook. Executing Ansible playbook..."
-    ansible-playbook -i hosts roles/haproxy/tasks/main.yml
+    echo "Found HAProxy playbook. Executing Ansible playbook with Vault..."
+    ansible-playbook -i hosts --vault-password-file "$vault_password_file" roles/haproxy/tasks/main.yml
 
     if [ $? -ne 0 ]; then
         echo "Execution of the HAProxy playbook failed. Please check the logs above for errors."
@@ -90,7 +105,7 @@ else
     exit 1
 fi
 
-echo "Ansible playbooks executed successfully."
+echo "Ansible playbook for HAProxy executed successfully."
 
 # 6. Verify HAProxy is load balancing
 # Fetch the IP address of the HAProxy instance using Terraform

@@ -3,10 +3,8 @@
   remote_user: jack
   become: true
   hosts: haproxy
-  vars:
-    haproxy_config_file: /etc/haproxy/haproxy.cfg
-    ansible_connection: ssh
-    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  vars_files:
+    - ../vars/secure_vars.yml
   tasks:
     - name: HAProxy Installation
       apt:
